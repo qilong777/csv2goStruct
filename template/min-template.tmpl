@@ -1,0 +1,20 @@
+package csv
+
+import (
+	"github.com/pkg/errors"
+	{{if isTool (.Type)}}"gonut/engine/algo/tool"{{end}}
+)
+// {{.Name}}Csv 123
+type {{.Name}}Csv struct {
+	{{range $i, $v := .Type}}{{if isShow (index $.Key $i)}}
+	// {{index $.Desc $i}}
+	{{if eq $v "float"}}{{index $.Key $i}} float32{{else if eq $v "json"}}{{index $.Key $i}} algo.JSONMap{{else if eq $v "json[]"}}{{index $.Key $i}} algo.JSONArray{{else}}{{index $.Key $i}} {{$v}}{{end}}{{end}}{{end}}
+}
+// {{.Name}}List 123
+var {{.Name}} map[{{index $.Type 0}}]{{.Name}}Csv = map[{{index $.Type 0}}]{{.Name}}Csv{
+	{{range $k, $val := .Record}} 
+	{{getID (index $.Type 0) (index $val 0)}}: {{$.Name}}Csv{
+	{{range $i, $v := $val}}{{if isShow (index $.Key $i)}}
+	{{if eq $v ""}}{{if eq (index $.Type $i) "string"}}{{index $.Key $i}}:"",{{else if eq (index $.Type $i) "bool"}}{{index $.Key $i}}:false,{{else if eq (index $.Type $i) "json"}}{{index $.Key $i}}:algo.JSONMap{},{{else if eq (index $.Type $i) "json[]"}}{{index $.Key $i}}:algo.JSONArray{},{{else}}{{index $.Key $i}}:0,{{end}}{{else}}{{if eq (index $.Type $i) "string"}}{{index $.Key $i}}:"{{$v}}",{{else if eq (index $.Type $i) "json"}}{{index $.Key $i}}:{{getDataByJSON (index $.Type $i) $v}},{{else if eq (index $.Type $i) "json[]"}}{{index $.Key $i}}:{{getDataByJSON (index $.Type $i) $v}},{{else}}{{index $.Key $i}}:{{$v}},{{end}}{{end}}{{end}}{{end}}
+	},{{end}}
+}
